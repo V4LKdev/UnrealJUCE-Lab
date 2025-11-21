@@ -1,4 +1,4 @@
-# UnrealJUCE-Lab – UltraLowLatencyAudio (UE5 C++ Plugin + JUCE)
+# UnrealJUCE-Lab - UltraLowLatencyAudio (UE5 C++ Plugin + JUCE)
 
 A small Unreal Engine 5 plugin lab that integrates **JUCE** as a custom audio/MIDI backend to explore **ultra-low-latency device I/O** (primarily via **ASIO on Windows**).  
 This is a technical code sample / experiment, not in any way a production-ready usable replacement for Unreal’s audio pipeline.
@@ -83,5 +83,4 @@ To use ASIO:
 2. Ensure JUCE is linked (setup above).
 3. Launch editor / PIE.
 4. The subsystem initializes JUCE audio + MIDI, and `AudioEngine` drives the callback/render path.
-
-This repo will stay focused on the core low-latency backend and integration experiments.
+5. Use the Blueprint exposed functions from the subsystem to interact with JUCE
