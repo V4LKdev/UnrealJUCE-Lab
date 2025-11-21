@@ -1,12 +1,87 @@
-Third-Party Library Setup:
+# UnrealJUCE-Lab – UltraLowLatencyAudio (UE5 C++ Plugin + JUCE)
 
-To use this project, you'll need to add the JUCE third-party library yourself. Follow these steps:
+A small Unreal Engine 5 plugin lab that integrates **JUCE** as a custom audio/MIDI backend to explore **ultra-low-latency device I/O** (primarily via **ASIO on Windows**).  
+This is a technical code sample / experiment, not in any way a production-ready usable replacement for Unreal’s audio pipeline.
 
-- Obtain JUCE: Download the latest JUCE framework from https://juce.com
-- Create a Static Library: Use Projucer to create a static library for the JUCE modules you need
-- Add to Project: Place the static library and the corresponding JUCE modules folder in a ThirdPartyFolder within your plugins's directory
+- **Stack:** Unreal Engine 5 plugin (C++), JUCE static library (external), CMake/Projucer build for JUCE
+- **Focus:** real-time audio callbacks, buffer negotiation, MIDI event handling, clean ThirdParty linkage
 
-Note: Ensure that the paths to the third-party library and modules are correctly configured in your project's build.cs.
+---
 
-To use this project with ASIO drivers, ensure ASIO drivers are installed and configured on your system. 
-Then, in the Projucer, enable ASIO support in the "JUCE Audio Devices" module before building the project.
+## Current status / known issues
+
+- The JUCE device callback path is working and can achieve very low latency with ASIO.
+- The Unreal integration layer and module linking are stable for Win64.
+
+**Known issue (important):**
+- When running audio through this backend over asio, Unreal’s native audio manager / sound class routing is currently disrupted.  
+  In other words, ACO/JUCE output does not participate cleanly in Unreal’s normal SoundClass/SoundMix/AudioMixer control.  
+  A proper solution will likely require a controlled bridge back into UE’s mixer or a hybrid routing approach.
+
+---
+
+## Key files
+
+- **JUCE linkage & platform config:** `UltraLowLatencyAudio.Build.cs`  
+- **Unreal ↔ JUCE boundary / includes:** `Private/JUCEPCH.h`  
+- **Audio device + callback core:** `Private/Audio/AudioEngine.*`  
+- **MIDI handling:** `Private/Audio/MidiCallback.*`, `Private/MIDIThread/*`  
+- **Unreal integration entrypoint:** `Private/Subsystem/*`
+
+---
+
+## Third-Party JUCE setup
+
+JUCE is **not included** in this repo. Build it separately and place it in `ThirdParty/`.
+
+### 1) Obtain JUCE
+Download and unpack JUCE from the official site:  
+https://juce.com
+
+### 2) Build a JUCE static library
+Using **Projucer**, create a **static library** containing the JUCE modules you need.
+
+Modules expected by this plugin (see `JUCEPCH.h`):
+- `juce_core`
+- `juce_events`
+- `juce_audio_basics`
+- `juce_audio_devices`
+- `juce_audio_processors`
+- `juce_audio_utils`
+
+### 3) Place headers + library here
+Expected layout:
+
+```ThirdParty/
+JUCE/
+Includes/
+modules/ <-- JUCE module headers
+Libraries/
+Release/
+JUCEStaticLib.lib <-- your built static lib (Win64)
+```
+
+If your library name/path differs, update `UltraLowLatencyAudio.Build.cs` accordingly.
+
+### ASIO (Windows)
+To use ASIO:
+1. Install ASIO drivers on your system.
+2. In Projucer, enable ASIO support in `juce_audio_devices` **before** building the static library.
+
+---
+
+## Build notes
+
+- RTTI and exceptions are enabled in `Build.cs` to match JUCE requirements.
+- `WITH_JUCE_BINDING` is used to guard compilation when JUCE is not present.
+
+---
+
+## Usage (lab workflow)
+
+1. Add the plugin to a UE5 project.
+2. Ensure JUCE is linked (setup above).
+3. Launch editor / PIE.
+4. The subsystem initializes JUCE audio + MIDI, and `AudioEngine` drives the callback/render path.
+
+This repo will stay focused on the core low-latency backend and integration experiments.
