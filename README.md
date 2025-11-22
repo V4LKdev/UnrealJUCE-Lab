@@ -6,6 +6,12 @@ This is a technical code sample / experiment, not in any way a production-ready 
 - **Stack:** Unreal Engine 5 plugin (C++), JUCE static library (external), CMake/Projucer build for JUCE
 - **Focus:** real-time audio callbacks, buffer negotiation, MIDI event handling, clean ThirdParty linkage
 
+**Related music-tech demos (YouTube):**  
+These clips show other parts of my broader UE/JUCE music framework that aren’t in this repo.
+
+- **[Quartz-synchronized MetaSounds music system demo](https://www.youtube.com/watch?v=uktz1KixA6s)** – beat-accurate playback + gameplay-driven transitions.  
+- **[Real-time MIDI input and Sample demo](https://www.youtube.com/watch?v=6hI5Qhj0GSw)** – low-latency MIDI capture and instrument routing.
+
 ---
 
 ## Current status / known issues
